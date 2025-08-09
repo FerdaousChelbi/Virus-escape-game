@@ -1,15 +1,17 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyDo4llw1qn8x-b-OKNkfZQfGNx81wD4w7M",
-    authDomain: "virus-escape-game.firebaseapp.com",
-    databaseURL: "https://virus-escape-game-default-rtdb.europe-west1.firebasedatabase.app/",
-    projectId: "virus-escape-game",
-    storageBucket: "virus-escape-game.firebasestorage.app",
-    messagingSenderId: "181801113501",
-    appId: "1:181801113501:web:a0815d2a3283fbdfdd8174",
-    measurementId: "G-0DTKTDM021"
+  apiKey: "AIzaSyDNTINr56vFNBN7uOzmDeJpE6bwejC_bCU",
+  authDomain: "virus-escape-game-70cea.firebaseapp.com",
+  databaseURL: "https://virus-escape-game-70cea-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "virus-escape-game-70cea",
+  storageBucket: "virus-escape-game-70cea.firebasestorage.app",
+  messagingSenderId: "705781646773",
+  appId: "1:705781646773:web:e389b487baabdbf5fec5fc"
 };
 
-// Éléments du DOM
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const scoresRef = db.ref('scores');
+
 const elements = {
     canvas: document.getElementById("gameCanvas"),
     startScreen: document.getElementById("startScreen"),
@@ -30,20 +32,15 @@ const elements = {
     right: document.getElementById("right"),
     dashboard: document.getElementById("dashboard"),
     leaderboard: document.getElementById("leaderboard"),
-    scoresList: document.getElementById("scoresList"),
     soundToggle: document.getElementById("soundToggle"),
     backgroundMusic: document.getElementById("backgroundMusic"),
     collisionSound: document.getElementById("collisionSound"),
     scoreSound: document.getElementById("scoreSound"),
-    winSound: document.getElementById("winSound"),
-    scoresList: document.getElementById("scoresList")
-
+    winSound: document.getElementById("winSound")
 };
 
-// Contexte du canvas
 const ctx = elements.canvas.getContext("2d");
-
-// Configuration du jeu
+        
 const config = {
     playerSize: 50,
     playerSpeed: 2,
@@ -55,7 +52,6 @@ const config = {
     maxVirusSpeed: 1
 };
 
-// État du jeu
 const state = {
     player: {
         x: 0,
@@ -85,7 +81,7 @@ const state = {
 elements.soundToggle.addEventListener("click", () => {
     state.soundEnabled = !state.soundEnabled;
     elements.soundToggle.textContent = state.soundEnabled ? "🔊" : "🔇";
-
+    
     if (state.soundEnabled) {
         if (state.gameActive) {
             elements.backgroundMusic.play().catch(e => console.log("Audio play prevented:", e));
@@ -98,79 +94,27 @@ elements.soundToggle.addEventListener("click", () => {
     }
 });
 
-try {
-    firebase.initializeApp(firebaseConfig);
-    console.log("Firebase initialized successfully");
-    
-    const db = firebase.database();
-    db.ref(".info/connected").on("value", (snapshot) => {
-        if (snapshot.val() === true) {
-            console.log("Connected to Firebase Realtime Database");
-        } else {
-            console.log("Not connected to Firebase");
-        }
+function updateLeaderboard() {
+    scoresRef.orderByChild('score').limitToLast(5).once('value', (snapshot) => {
+        const scores = [];
+        snapshot.forEach((childSnapshot) => {
+            scores.push(childSnapshot.val());
+        });
+        scores.sort((a, b) => b.score - a.score);
+        
+        elements.leaderboard.innerHTML = '';
+        scores.forEach((player, index) => {
+            const entry = document.createElement('div');
+            entry.className = 'leaderboard-entry';
+            entry.innerHTML = `
+                <span>${index + 1}. ${player.name}</span>
+                <span>${player.score} pts</span>
+            `;
+            elements.leaderboard.appendChild(entry);
+        });
     });
-} catch (error) {
-    console.error("Firebase initialization error:", error);
 }
 
-function saveScore(name, score) {
-    if (!name || !score) {
-        console.error("Invalid score data");
-        return;
-    }
-
-    const scoresRef = db.ref("scores");
-    const newScoreRef = scoresRef.push();
-    
-    const scoreData = {
-        name: name,
-        score: score,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        userAgent: navigator.userAgent
-    };
-
-    newScoreRef.set(scoreData)
-        .then(() => {
-            console.log("Score saved successfully");
-            loadLeaderboard(); 
-        })
-        .catch((error) => {
-            console.error("Error saving score:", error);
-            localStorage.setItem("pendingScore", JSON.stringify(scoreData));
-        });
-}
-
-
-function loadLeaderboard() {
-    db.ref("scores")
-        .orderByChild("score")
-        .limitToLast(5) 
-        .once("value")
-        .then((snapshot) => {
-            const scores = [];
-            snapshot.forEach((child) => {
-                scores.push({
-                    name: child.val().name,
-                    score: child.val().score
-                });
-            });
-            
-            scores.sort((a, b) => b.score - a.score);
-            
-            elements.scoresList.innerHTML = "";
-            scores.slice(0, 5).forEach((score, index) => {
-                const li = document.createElement("li");
-                li.textContent = `${index + 1}. ${score.name}: ${score.score} pts`;
-                elements.scoresList.appendChild(li);
-            });
-        })
-        .catch((error) => {
-            console.error("Error loading leaderboard:", error);
-            elements.scoresList.innerHTML = "<li>Could not load leaderboard</li>";
-        });
-}
-// Images
 const images = {
     player: new Image(),
     virus: new Image()
@@ -230,7 +174,7 @@ const setupKeyboard = () => {
 const resizeCanvas = () => {
     const maxWidth = window.innerWidth - 40;
     const maxHeight = window.innerHeight * 0.5;
-    const ratio = 2 / 3;
+    const ratio = 2/3;
 
     if (maxWidth / ratio <= maxHeight) {
         elements.canvas.width = maxWidth;
@@ -242,7 +186,7 @@ const resizeCanvas = () => {
 
     state.canvasSize.width = elements.canvas.width;
     state.canvasSize.height = elements.canvas.height;
-
+    
     if (state.gameActive) {
         state.player.x = elements.canvas.width / 2 - config.playerSize / 2;
         state.player.y = elements.canvas.height - config.playerSize - 20;
@@ -313,17 +257,33 @@ const updateViruses = () => {
 
 const draw = () => {
     ctx.clearRect(0, 0, state.canvasSize.width, state.canvasSize.height);
-    ctx.drawImage(images.player, state.player.x, state.player.y, config.playerSize, config.playerSize);
+    
+    ctx.drawImage(
+        images.player,
+        state.player.x,
+        state.player.y,
+        config.playerSize,
+        config.playerSize
+    );
+    
     state.viruses.forEach(virus => {
-        ctx.drawImage(images.virus, virus.x, virus.y, virus.width, virus.height);
+        ctx.drawImage(
+            images.virus,
+            virus.x,
+            virus.y,
+            virus.width,
+            virus.height
+        );
     });
 };
 
 const gameLoop = () => {
     if (!state.gameActive) return;
+    
     updatePlayer();
     updateViruses();
     draw();
+    
     state.animationId = requestAnimationFrame(gameLoop);
 };
 
@@ -333,8 +293,10 @@ const startTimer = () => {
             clearInterval(timerInterval);
             return;
         }
+        
         state.timeLeft--;
         elements.timer.textContent = `${state.timeLeft}s`;
+        
         if (state.timeLeft <= 0) {
             if (state.soundEnabled) {
                 elements.winSound.play().catch(e => console.log("Audio play prevented:", e));
@@ -348,9 +310,20 @@ const startTimer = () => {
 const endGame = (timeOut) => {
     state.gameActive = false;
     cancelAnimationFrame(state.animationId);
+    
     elements.backgroundMusic.pause();
-    saveScore(state.player.name, state.score);
+    
+    const scoreData = {
+        name: state.player.name,
+        score: state.score,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+    
+    scoresRef.push(scoreData);
+    updateLeaderboard();
+    
     elements.gameOver.style.display = "block";
+    
     if (timeOut) {
         elements.resultTitle.textContent = "Félicitations !";
         elements.resultScore.textContent = `Vous avez gagné ${state.score} points !`;
@@ -366,7 +339,9 @@ elements.backButton.addEventListener("click", () => {
     elements.infoDisplay.style.display = "none";
     elements.controls.style.display = "none";
     elements.dashboard.style.display = "none";
+    
     elements.startScreen.style.display = "block";
+    
     state.viruses = [];
     state.score = 0;
     state.timeLeft = config.gameDuration;
@@ -374,24 +349,31 @@ elements.backButton.addEventListener("click", () => {
 
 const startGame = () => {
     state.player.name = elements.playerName.value.trim() || "Joueur";
+    
     elements.startScreen.style.display = "none";
     elements.canvas.style.display = "block";
     elements.infoDisplay.style.display = "flex";
     elements.controls.style.display = "grid";
     elements.dashboard.style.display = "block";
+    
     elements.playerDisplay.textContent = state.player.name;
+    
     resizeCanvas();
+    
     state.gameActive = true;
     state.player.x = state.canvasSize.width / 2 - config.playerSize / 2;
     state.player.y = state.canvasSize.height - config.playerSize - 20;
     state.score = 0;
     state.timeLeft = config.gameDuration;
+    
     elements.score.textContent = "0 pts";
     elements.timer.textContent = `${config.gameDuration}s`;
+    
     if (state.soundEnabled) {
         elements.backgroundMusic.volume = 0.3;
         elements.backgroundMusic.play().catch(e => console.log("Audio play prevented:", e));
     }
+    
     startTimer();
     gameLoop();
 };
@@ -401,9 +383,11 @@ const init = () => {
     elements.playerName.addEventListener("keypress", (e) => {
         if (e.key === "Enter") startGame();
     });
+    
     setupControls();
     setupKeyboard();
     window.addEventListener("resize", resizeCanvas);
+    
     let imagesLoaded = 0;
     const imageLoaded = () => {
         imagesLoaded++;
@@ -413,7 +397,8 @@ const init = () => {
     };
     images.player.onload = imageLoaded;
     images.virus.onload = imageLoaded;
-    loadLeaderboard();
+    
+    updateLeaderboard();
 };
 
 init();
