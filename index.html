@@ -17,11 +17,11 @@
             color: #fff;
             text-align: center;
             overflow: hidden;
-            height: 100vh;
+            height: 50vh;
             display: flex;
             flex-direction: column;
         }
-        h1 {
+        h2 {
             color: #ff6464;
             padding: 15px;
             font-size: 1.5rem;
@@ -87,7 +87,7 @@
         .info-display {
             display: flex;
             justify-content: space-around;
-            padding: 10px;
+            padding: 5px;
             font-size: 1.2rem;
             color: #ff6464;
             display: none;
@@ -98,7 +98,7 @@
                 ". up ."
                 "left down right";
             gap: 10px;
-            padding: 20px;
+            padding: 10px;
             display: none;
             justify-content: center;
         }
@@ -106,9 +106,9 @@
             background: rgba(255, 100, 100, 0.3);
             border: 2px solid #ff6464;
             color: white;
-            font-size: 24px;
-            width: 70px;
-            height: 70px;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -129,22 +129,22 @@
             transform: translate(-50%, -50%);
             background: rgba(10, 25, 47, 0.95);
             color: #ff6464;
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
             border: 2px solid #ff6464;
             text-align: center;
             display: none;
-            width: 90%;
-            max-width: 350px;
+            width: 70%;
+            max-width: 300px;
             z-index: 10;
         }
         #gameOver h2 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             margin-bottom: 5px;
             color: #4CAF50;
         }
         #resultScore {
-            font-size: 1.2rem;
+            font-size: 1rem;
             margin: 10px 0;
         }
         #dashboard {
@@ -153,7 +153,7 @@
             left: 0;
             width: 100%;
             background: rgba(10, 25, 47, 0.9);
-            padding: 10px;
+            padding: 5px;
             border-top: 2px solid #ff6464;
             display: none;
             z-index: 5;
@@ -202,39 +202,32 @@
     </style>
 </head>
 <body>
-    <h1>Virus Escape - ACM ENSTAB</h1>
-    
+    <h2>Virus Escape - ACM ENSTAB</h2>
     <div id="soundToggle">🔊</div>
-    
     <div id="gameContainer">
         <div id="startScreen">
             <h2>Entrez votre pseudo</h2>
             <input type="text" id="playerName" placeholder="Votre nom..." maxlength="12" autocomplete="off">
             <button id="startButton">DÉMARRER</button>
         </div>
-        
         <div class="info-display">
             <div id="playerDisplay"></div>
             <div id="timer">30s</div>
             <div id="score">0 pts</div>
         </div>
-        
         <canvas id="gameCanvas"></canvas>
-        
         <div id="gameOver">
             <h2 id="resultTitle"></h2>
             <p id="resultScore"></p>
             <button id="backButton">RETOUR</button>
         </div>
     </div>
-    
     <div class="controls">
         <button id="up">⬆️</button>
         <button id="left">⬅️</button>
         <button id="down">⬇️</button>
         <button id="right">➡️</button>
     </div>
-    
     <div id="dashboard">
         <h3>Top 5 des Joueurs</h3>
         <div id="leaderboard"></div>
@@ -289,13 +282,13 @@
         // Configuration du jeu
         const config = {
             playerSize: 50,
-            playerSpeed: 4,
+            playerSpeed: 2,
             virusSpawnRate: 1000,
             gameDuration: 30,
             minVirusSize: 20,
             maxVirusSize: 30,
-            minVirusSpeed: 1,
-            maxVirusSpeed: 2
+            minVirusSpeed: 0.5,
+            maxVirusSpeed: 1
         };
 
         // État du jeu
@@ -673,5 +666,4 @@
         init();
     </script>
 </body>
-
 </html>
