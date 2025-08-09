@@ -4,202 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Virus Escape - ACM ENSTAB</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            touch-action: manipulation;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #0a192f;
-            color: #fff;
-            text-align: center;
-            overflow: hidden;
-            height: 50vh;
-            display: flex;
-            flex-direction: column;
-        }
-        h2 {
-            color: #ff6464;
-            padding: 15px;
-            font-size: 1.5rem;
-            text-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
-        }
-        #gameContainer {
-            position: relative;
-            margin: 0 auto;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-        }
-        #startScreen {
-            background: rgba(10, 25, 47, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            margin: 0 auto;
-            border: 1px solid #ff6464;
-        }
-        #startScreen h2 {
-            color: #ff6464;
-            margin-bottom: 15px;
-        }
-        #playerName {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #ff1e1e;
-            border-radius: 5px;
-            font-size: 16px;
-            background: rgba(255, 30, 30, 0.1);
-            color: white;
-        }
-        #startButton {
-            background: linear-gradient(135deg, #ff1e1e, #ff6464);
-            color: white;
-            border: none;
-            padding: 12px 0;
-            width: 100%;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #startButton:active {
-            transform: scale(0.98);
-        }
-        canvas {
-            display: block;
-            border: 3px solid #ff1e1e;
-            background: #0a192f;
-            border-radius: 10px;
-            margin: 0 auto;
-            max-width: 100%;
-            max-height: 60vh;
-            display: none;
-        }
-        .info-display {
-            display: flex;
-            justify-content: space-around;
-            padding: 5px;
-            font-size: 1.2rem;
-            color: #ff6464;
-            display: none;
-        }
-        .controls {
-            display: grid;
-            grid-template-areas:
-                ". up ."
-                "left down right";
-            gap: 10px;
-            padding: 10px;
-            display: none;
-            justify-content: center;
-        }
-        .controls button {
-            background: rgba(255, 100, 100, 0.3);
-            border: 2px solid #ff6464;
-            color: white;
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-        }
-        .controls button:active {
-            background: rgba(255, 100, 100, 0.7);
-        }
-        #up { grid-area: up; }
-        #left { grid-area: left; }
-        #down { grid-area: down; }
-        #right { grid-area: right; }
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(10, 25, 47, 0.95);
-            color: #ff6464;
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px solid #ff6464;
-            text-align: center;
-            display: none;
-            width: 70%;
-            max-width: 300px;
-            z-index: 10;
-        }
-        #gameOver h2 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-            color: #4CAF50;
-        }
-        #resultScore {
-            font-size: 1rem;
-            margin: 10px 0;
-        }
-        #dashboard {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(10, 25, 47, 0.9);
-            padding: 5px;
-            border-top: 2px solid #ff6464;
-            display: none;
-            z-index: 5;
-        }
-        #dashboard h3 {
-            color: #ff6464;
-            margin-bottom: 5px;
-            font-size: 1rem;
-        }
-        #leaderboard {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-        #backButton {
-            background: #ff6464;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #soundToggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 100, 100, 0.3);
-            border: 2px solid #ff6464;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 20;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h2>Virus Escape - ACM ENSTAB</h2>
@@ -235,13 +40,13 @@
 
     <!-- Audio elements -->
     <audio id="backgroundMusic" loop>
-        <source src="Sonic.m4a" type="audio/mpeg">
+        <source src="assets/Sonic.m4a" type="audio/mpeg">
     </audio>
     <audio id="collisionSound">
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-2759.mp3" type="audio/mpeg">
     </audio>
     <audio id="scoreSound">
-        <source src="Coin Collect.m4a" type="audio/mpeg">
+        <source src="assets/Coin Collect.m4a" type="audio/mpeg">
     </audio>
     <audio id="winSound">
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
